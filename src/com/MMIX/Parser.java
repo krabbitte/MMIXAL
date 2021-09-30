@@ -1,12 +1,11 @@
-package com.keith.MMIX;
+package com.MMIX;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.keith.MMIX.TokenType.*;
+import static com.MMIX.TokenType.*;
 
 class Parser {
     private static class ParseError extends RuntimeException {}

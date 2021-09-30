@@ -1,4 +1,4 @@
-package com.keith.MMIX;
+package com.MMIX;
 
 enum TokenType {
     // Single-character tokens

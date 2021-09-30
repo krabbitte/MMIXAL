@@ -1,4 +1,4 @@
-package com.keith.MMIX;
+package com.MMIX;
 
 abstract class Expr {
     interface Visitor<R> {

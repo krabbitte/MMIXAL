@@ -1,4 +1,4 @@
-package com.keith.MMIX;
+package com.MMIX;
 
 public class Token {
     final TokenType type;

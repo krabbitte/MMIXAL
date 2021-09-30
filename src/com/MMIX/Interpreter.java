@@ -1,9 +1,6 @@
-package com.keith.MMIX;
+package com.MMIX;
 
-import java.awt.desktop.SystemEventListener;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
