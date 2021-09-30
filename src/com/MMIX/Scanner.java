@@ -285,7 +285,6 @@ public class Scanner {
                 line++;
                 while(peek() == '\n') {
                     advance();
-                    line++;
                 }
                 break;
 

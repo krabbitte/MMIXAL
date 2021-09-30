@@ -65,7 +65,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         int x = (int)arg1 - (int)arg2;
 
-        System.out.println("Sub done: " + x);
+        System.out.println("SUB: M[" + (int)arg1 + "] <- " + x);
 
         return null;
     }
