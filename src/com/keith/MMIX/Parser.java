@@ -208,7 +208,7 @@ class Parser {
 
         opArgs.put(PREFIX, 1);
 
-        opArgs.put(TRIP, 3);
+        opArgs.put(TRIP, 0);
     }
 
     Parser(List<Token> tokens) { this.tokens = tokens; }
