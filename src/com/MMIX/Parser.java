@@ -264,13 +264,9 @@ class Parser {
         if(tokens.get(current).type == IDENTIFIER) {
             label = label();
             advance();
-        } else if(tokens.get(current).type.ordinal() >= 19 && tokens.get(current).type.ordinal() <= 28){
+        } else if(tokens.get(current).type.ordinal() >= 19 && tokens.get(current).type.ordinal() <= 48){
             label = label();
             advance();
-        } else if(tokens.get(current).type.ordinal() >= 29 && tokens.get(current).type.ordinal() <= 48) {
-            label = null;
-            advance();
-            MMIX.error(tokens.get(current), "wrong local symbol");
         } else {
             label = null;
         }
@@ -333,6 +329,11 @@ class Parser {
     private Expr label() {
         Token label = tokens.get(current);
 
+        if(label.type.ordinal() >= 29 && label.type.ordinal() <= 48) {
+            MMIX.error(tokens.get(current), "wrong local symbol");
+            return null;
+        }
+
         return new Expr.Label(label);
     }
 
@@ -386,6 +387,10 @@ class Parser {
 
             previous().lexeme = this.prefix + (String)previous().lexeme;
 
+            return new Expr.Variable(previous());
+        }
+
+        if(match(REG)) {
             return new Expr.Variable(previous());
         }
 

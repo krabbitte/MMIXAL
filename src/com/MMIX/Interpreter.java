@@ -1,6 +1,7 @@
 package com.MMIX;
 
 import java.util.List;
+import static com.MMIX.TokenType.*;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
@@ -24,35 +25,34 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x;
-        byte[] num;
+        int x,y,z;
 
-        x = (int)arg2 + (int)arg3;
-
-        num = new byte[] {
-                (byte)((x >> 24) & 0xff),
-                (byte)((x >> 16) & 0xff),
-                (byte)((x >> 8) & 0xff),
-                (byte)(x & 0xff),
-        };
-
-        if(arg1 instanceof Integer) {
-            for (int i = 0; i < num.length; i++) {
-                MMIX.environment.memory[(int) arg1][i] = num[i];
-            }
-        } else if(arg1 instanceof Token) {
-            System.out.println(((Token)arg1).lexeme.substring(1,2));
-            for (int i = 0; i < num.length; i++) {
-                MMIX.environment.special[Integer.parseInt(((Token)arg1).lexeme.substring(1,2))][i] = num[i];
-            }
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
         }
 
-        x = (num[0] & 0xff) << 24 |
-            (num[1] & 0xff) << 16 |
-            (num[2] & 0xff) << 8  |
-            (num[3] & 0xff);
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
 
-        System.out.println("ADD: M[" + (int)arg1 + "] <- " + x);
+        x = y + z;
+
+        if(arg1 instanceof Integer) {
+            MMIX.environment.storeMem((int)arg1, x);
+            System.out.println("ADD: M[" + arg1 + "] <- " + x);
+        } else if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ADD: R[" + index + "] <- " + x);
+        }
 
         return null;
     }
@@ -63,7 +63,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x = (int)arg1 - (int)arg2;
+        int x = (int)arg2 - (int)arg3;
 
         System.out.println("SUB: M[" + (int)arg1 + "] <- " + x);
 
@@ -1456,11 +1456,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Object visitVariableExpr(Expr.Variable expr) {
 
         Object value = null;
-        if (MMIX.environment.values.containsKey(expr.name.lexeme))
+
+        if(expr.name.type == REG) {
+            value = expr.name;
+        }
+        else if (MMIX.environment.values.containsKey(expr.name.lexeme))
         {
             value = MMIX.environment.values.get(expr.name.lexeme);
         }
-        else if(expr.name.type.ordinal() >= 29 && expr.name.type.ordinal() <= 48)
+        else if (expr.name.type.ordinal() >= 29 && expr.name.type.ordinal() <= 48)
         {
 
             for(int i = 0; i < MMIX.environment.locals.size(); i++) {
@@ -1492,8 +1496,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
             }
 
-        } else
-        {
+        } else {
             MMIX.error(expr.name,"identifier does not correspond to value");
         }
 

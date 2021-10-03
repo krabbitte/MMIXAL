@@ -35,12 +35,12 @@ public class MMIX {
         /*
         for(Token token : tokens) {
             if(token.type != TokenType.EOL) {
-                System.out.println(token.lexeme + " " + token.line);
+                System.out.println(token.lexeme + " ");
             } else {
                 System.out.println(token.type.toString());
             }
-        }
-         */
+        }*/
+
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
