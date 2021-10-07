@@ -41,7 +41,6 @@ public class MMIX {
             }
         }*/
 
-
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
 

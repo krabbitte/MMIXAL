@@ -29,8 +29,8 @@ class Parser {
         opArgs.put(MULU, 3);
         opArgs.put(DIVU, 3);
 
-        opArgs.put(NEG, 3);
-        opArgs.put(NEGU, 3)
+        opArgs.put(NEG, 2);
+        opArgs.put(NEGU, 2)
         ;
         opArgs.put(CMP, 3);
         opArgs.put(CMPU, 3);
@@ -144,14 +144,14 @@ class Parser {
 
         opArgs.put(GO, 3);
 
-        opArgs.put(BZ, 3);
-        opArgs.put(BNZ, 3);
-        opArgs.put(BN, 3);
-        opArgs.put(BNN, 3);
-        opArgs.put(BP, 3);
-        opArgs.put(BNP, 3);
-        opArgs.put(BOD, 3);
-        opArgs.put(BEV, 3);
+        opArgs.put(BZ, 2);
+        opArgs.put(BNZ, 2);
+        opArgs.put(BN, 2);
+        opArgs.put(BNN, 2);
+        opArgs.put(BP, 2);
+        opArgs.put(BNP, 2);
+        opArgs.put(BOD, 2);
+        opArgs.put(BEV, 2);
 
         opArgs.put(CSZ, 3);
         opArgs.put(CSNZ, 3);
@@ -316,6 +316,8 @@ class Parser {
                 return new Stmt.STCO(label, args, opcode.line);
             case LDA:
                 return new Stmt.LDA(label, args, opcode.line);
+            case BN:
+                return new Stmt.BN(label, args, opcode.line);
             case JMP:
                 return new Stmt.JMP(label, args, opcode.line);
             case TRIP:

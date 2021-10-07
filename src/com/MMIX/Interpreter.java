@@ -19,8 +19,349 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
+    // Done
     @Override
     public Void visitADD(Stmt.ADD stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            throw new RuntimeError(new Token(REG, "error", null, stmt.line), "not a register");
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y + z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ADD: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Done
+    @Override
+    public Void visitSUB(Stmt.SUB stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "Y is not a register");
+            return null;
+        }
+
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y - z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("SUB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Done
+    @Override
+    public Void visitMUL(Stmt.MUL stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "Y is not a register");
+            return null;
+        }
+
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y * z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("MUL: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Done
+    @Override
+    public Void visitDIV(Stmt.DIV stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "Y is not a register");
+            return null;
+        }
+
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y/z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("DIV: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Partially Done
+    @Override
+    public Void visitLDB(Stmt.LDB stmt)     {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = MMIX.environment.loadMem((y + z) % (2^64));
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Partially Done
+    @Override
+    public Void visitLDW(Stmt.LDW stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = MMIX.environment.loadMem((y + z) % (2^64));
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Partially Done
+    @Override
+    public Void visitLDT(Stmt.LDT stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = MMIX.environment.loadMem((y + z) % (2^64));
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Partially Done
+    @Override
+    public Void visitLDO(Stmt.LDO stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = MMIX.environment.loadMem((y + z) % (2^64));
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Partially Done
+    @Override
+    public Void visitLDHT(Stmt.LDHT stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+        Object arg3 = evaluate(stmt.args.get(2));
+
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = MMIX.environment.loadMem((y + z) % (2^64));
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
+
+        return null;
+    }
+
+    // Done
+    @Override
+    public Void visitLDA(Stmt.LDA stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
@@ -45,295 +386,647 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         x = y + z;
 
-        if(arg1 instanceof Integer) {
-            MMIX.environment.storeMem((int)arg1, x);
-            System.out.println("ADD: M[" + arg1 + "] <- " + x);
-        } else if(arg1 instanceof Token) {
+        if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("ADD: R[" + index + "] <- " + x);
+            System.out.println("LDB: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
         }
 
         return null;
     }
 
-    @Override
-    public Void visitSUB(Stmt.SUB stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        int x = (int)arg2 - (int)arg3;
-
-        System.out.println("SUB: M[" + (int)arg1 + "] <- " + x);
-
-        return null;
-    }
-
-    @Override
-    public Void visitMUL(Stmt.MUL stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("Mul done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitDIV(Stmt.DIV stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("DIV done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDB(Stmt.LDB stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDB done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDW(Stmt.LDW stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDW done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDT(Stmt.LDT stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDT done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDO(Stmt.LDO stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDO done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDHT(Stmt.LDHT stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDHT done");
-
-        return null;
-    }
-
-    @Override
-    public Void visitLDA(Stmt.LDA stmt) {
-        Object arg1 = evaluate(stmt.args.get(0));
-        Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
-
-        System.out.println("LDA done");
-
-        return null;
-    }
-
+    // Partially Done
     @Override
     public Void visitSTB(Stmt.STB stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STB done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        x = Math.abs(x);
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        int index = (y+z) % (2^64);
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(index, x);
+            System.out.println("STB: M[" + (index) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitSTW(Stmt.STW stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STW done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(y+z, x);
+            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitSTT(Stmt.STT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STT done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(y+z, x);
+            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitSTO(Stmt.STO stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STO done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(y+z, x);
+            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitSTHT(Stmt.STHT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STHT done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(y+z, x);
+            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitSTCO(Stmt.STCO stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("STCO done");
+        int x,y,z;
+
+        if(arg1 instanceof Integer) {
+            x = (int) arg1;
+        } else if (arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
+        } else {
+            x = 0;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg(x);
+            MMIX.environment.storeMem(y+z, x);
+            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitNEG(Stmt.NEG stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("NEG done");
+        int x,y;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "Y not a register");
+            return null;
+        }
+
+        x = ~y;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("NEG: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitAND(Stmt.AND stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("AND done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y & z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("AND: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitOR(Stmt.OR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("OR done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y | z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("OR: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitXOR(Stmt.XOR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("XOR done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y ^ z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("XOR: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitANDN(Stmt.ANDN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ANDN done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y & ~z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ANDN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitORN(Stmt.ORN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ORN done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = y | ~z;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ORN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitNAND(Stmt.NAND stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("NAND done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = ~(y & z);
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("NAND: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitNOR(Stmt.NOR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("NOR done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = ~(y | z);
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("NOR: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitNXOR(Stmt.NXOR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("NXOR done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = ~(y ^ z);
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("NXOR: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitMUX(Stmt.MUX stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("MUX done");
+        int x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = 0;
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("MUX: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitBDIF(Stmt.BDIF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -345,6 +1038,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitWDIF(Stmt.WDIF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -356,6 +1050,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitTDIF(Stmt.TDIF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -367,6 +1062,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitODIF(Stmt.ODIF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -378,6 +1074,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come back
     @Override
     public Void visitSADD(Stmt.SADD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -389,6 +1086,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitMOR(Stmt.MOR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -400,6 +1098,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitMXOR(Stmt.MXOR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -411,6 +1110,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSETH(Stmt.SETH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -422,6 +1122,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSETMH(Stmt.SETMH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -433,6 +1134,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSETML(Stmt.SETML stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -444,6 +1146,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSETL(Stmt.SETL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -455,6 +1158,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitINCH(Stmt.INCH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -466,6 +1170,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitINCMH(Stmt.INCMH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -477,6 +1182,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitINCML(Stmt.INCML stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -488,6 +1194,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitINCL(Stmt.INCL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -499,6 +1206,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitORH(Stmt.ORH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -510,6 +1218,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitORMH(Stmt.ORMH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -521,6 +1230,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitORML(Stmt.ORML stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -532,6 +1242,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitORL(Stmt.ORL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -543,6 +1254,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitANDNH(Stmt.ANDNH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -554,6 +1266,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitANDNMH(Stmt.ANDNMH stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -565,6 +1278,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitANDNML(Stmt.ANDNML stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -576,6 +1290,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitANDNL(Stmt.ANDNL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -587,6 +1302,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSL(Stmt.SL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -598,6 +1314,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSLU(Stmt.SLU stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -609,6 +1326,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSR(Stmt.SR stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -620,6 +1338,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSRU(Stmt.SRU stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -631,292 +1350,1058 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Done
     @Override
     public Void visitCMP(Stmt.CMP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CMP done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y > z) {
+            x = 1;
+        } else if (y == z) {
+            x = 0;
+        } else {
+            x = -1;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CMP: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCMPU(Stmt.CMPU stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CMPU done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        y = Math.abs(y);
+        z = Math.abs(z);
+
+        if(y > z) {
+            x = 1;
+        } else if (y == z) {
+            x = 0;
+        } else {
+            x = -1;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CMPU: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSN(Stmt.CSN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSN done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y < 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSZ(Stmt.CSZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSZ done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            return null;
+        }
+
+        if(y == 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSZ: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSP(Stmt.CSP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSP done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y > 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSP: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSOD(Stmt.CSOD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSOD done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y % 2 != 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSOD: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSNN(Stmt.CSNN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSNN done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y >= 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSNN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSNZ(Stmt.CSNZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSNZ done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y != 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSNZ: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSNP(Stmt.CSNP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSNP done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y <= 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSNP: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitCSEV(Stmt.CSEV stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("CSEV done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y % 2 == 0) {
+            x = z;
+        } else {
+            return null;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("CSEV: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSN(Stmt.ZSN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSN done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y < 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSZ(Stmt.ZSZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSZ done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y == 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSZ: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSP(Stmt.ZSP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSP done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y > 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSP: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSOD(Stmt.ZSOD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSOD done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y % 2 != 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSOD: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSNN(Stmt.ZSNN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSNN done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y >= 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSNN: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSNZ(Stmt.ZSNZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSNZ done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y != 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSNZ: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSNP(Stmt.ZSNP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSNP done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y <= 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSNP: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitZSEV(Stmt.ZSEV stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("ZSEV done");
+        int x,y,z;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        if(y % 2 == 0) {
+            x = z;
+        } else {
+            x = 0;
+        }
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("ZSeV: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBN(Stmt.BN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BN done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x < 0) {
+            System.out.println("BN: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BN: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBZ(Stmt.BZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BZ done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x == 0) {
+            System.out.println("BZ: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BZ: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBP(Stmt.BP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BP done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x > 0) {
+            System.out.println("BP: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BP: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBOD(Stmt.BOD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BOD done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x % 2 == 0) {
+            System.out.println("BOD: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BOD: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBNN(Stmt.BNN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BNN done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x != 0) {
+            System.out.println("BNN: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BNN: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBNZ(Stmt.BNZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BNZ done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x != 0) {
+            System.out.println("BP: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BP: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBNP(Stmt.BNP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BNP done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x <= 0) {
+            System.out.println("BNP: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BNP: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Done
     @Override
     public Void visitBEV(Stmt.BEV stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("BEV done");
+        int line = 0;
+        int x = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            line = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            line = (int)((Token)arg2).literal;
+        }
+
+        x = MMIX.environment.loadReg(x);
+
+        if(x % 2 == 0) {
+            System.out.println("BEV: Branch taken - pc <- " + line);
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BEV: Branch not taken - pc <- " + line);
+        }
 
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBN(Stmt.PBN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -928,6 +2413,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBZ(Stmt.PBZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -939,6 +2425,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBP(Stmt.PBP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -950,6 +2437,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBOD(Stmt.PBOD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -961,6 +2449,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBNN(Stmt.PBNN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -972,6 +2461,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBNZ(Stmt.PBNZ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -983,6 +2473,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBNP(Stmt.PBNP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -994,6 +2485,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPBEV(Stmt.PBEV stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1005,6 +2497,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitGETA(Stmt.GETA stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1016,6 +2509,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitGO(Stmt.GO stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1027,6 +2521,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFADD(Stmt.FADD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1038,6 +2533,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFSUB(Stmt.FSUB stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1049,6 +2545,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFMUL(Stmt.FMUL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1060,6 +2557,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFDIV(Stmt.FDIV stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1071,6 +2569,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFREM(Stmt.FREM stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1082,6 +2581,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFSQRT(Stmt.FSQRT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1093,6 +2593,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFINT(Stmt.FINT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1104,6 +2605,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFCMP(Stmt.FCMP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1115,6 +2617,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFEQL(Stmt.FEQL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1126,6 +2629,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFUN(Stmt.FUN stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1137,6 +2641,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFCMPE(Stmt.FCMPE stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1148,6 +2653,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFEQLE(Stmt.FEQLE stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1159,6 +2665,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFUNE(Stmt.FUNE stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1170,6 +2677,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitLDSF(Stmt.LDSF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1181,6 +2689,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSTSF(Stmt.STSF stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1192,6 +2701,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFIX(Stmt.FIX stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1203,6 +2713,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFIXU(Stmt.FIXU stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1214,6 +2725,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFLOT(Stmt.FLOT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1225,6 +2737,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitFLOTU(Stmt.FLOTU stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1236,6 +2749,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPUSHJ(Stmt.PUSHJ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1247,6 +2761,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPUSHGO(Stmt.PUSHGO stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1258,6 +2773,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitLDUNC(Stmt.LDUNC stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1269,6 +2785,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSTUNC(Stmt.STUNC stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1280,6 +2797,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPRELD(Stmt.PRELD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1291,6 +2809,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPREGO(Stmt.PREGO stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1302,6 +2821,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPREST(Stmt.PREST stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1313,6 +2833,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitCSWAP(Stmt.CSWAP stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1324,6 +2845,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSYNC(Stmt.SYNC stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1335,6 +2857,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitRESUME(Stmt.RESUME stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1346,6 +2869,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitGET(Stmt.GET stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1357,6 +2881,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitPUT(Stmt.PUT stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1368,6 +2893,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSAVE(Stmt.SAVE stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1379,6 +2905,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitUNSAVE(Stmt.UNSAVE stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1390,6 +2917,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitLDVTS(Stmt.LDVTS stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1401,6 +2929,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Come Back
     @Override
     public Void visitSWYM(Stmt.SWYM stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
@@ -1412,6 +2941,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Done
     @Override
     public Void visitJMP(Stmt.JMP stmt) {
         Object arg = evaluate(stmt.args.get(0));
@@ -1432,6 +2962,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Done
     @Override
     public Void visitIS(Stmt.IS stmt) {
 
@@ -1443,6 +2974,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    // Partially Done
     @Override
     public Void visitTRIP(Stmt.TRIP stmt) {
 
@@ -1466,7 +2998,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
         else if (expr.name.type.ordinal() >= 29 && expr.name.type.ordinal() <= 48)
         {
-
             for(int i = 0; i < MMIX.environment.locals.size(); i++) {
 
                 if(MMIX.environment.locals.get(i) == expr.name) {
