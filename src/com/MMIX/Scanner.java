@@ -135,7 +135,7 @@ public class Scanner {
         keywords.put("LDB", LDB);
         keywords.put("LDW", LDW);
         keywords.put("LDT", LDT);
-        keywords.put("LD0", LDO);
+        keywords.put("LDO", LDO);
 
         keywords.put("STB", STB);
         keywords.put("STW", STW);

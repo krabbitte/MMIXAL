@@ -26,7 +26,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -62,7 +62,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -100,7 +100,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -138,7 +138,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -171,15 +171,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     // Partially Done
     @Override
-    public Void visitLDB(Stmt.LDB stmt)     {
+    public Void visitLDB(Stmt.LDB stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
-            y = (int) arg2;
+            y = Long.valueOf((int)arg2);
         } else if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
         } else {
@@ -187,19 +187,20 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg3 instanceof Integer) {
-            z = (int)arg3;
+            z = Long.valueOf((int)arg3);
         } else if(arg3 instanceof Token) {
             z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
         } else {
             z = 0;
         }
 
-        x = MMIX.environment.loadMem((y + z) % (2^64));
+        x = MMIX.environment.loadMem((int)y, (int)z, 'B');
+        System.out.println(x);
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDB: R[" + index + "] <- M[" + (y+z) + "]" + MMIX.environment.loadReg(index));
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -214,7 +215,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -232,12 +233,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             z = 0;
         }
 
-        x = MMIX.environment.loadMem((y + z) % (2^64));
+        x = MMIX.environment.loadMem((int)y, (int)z, 'W');
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDW: R[" + index + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -252,7 +253,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -270,12 +271,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             z = 0;
         }
 
-        x = MMIX.environment.loadMem((y + z) % (2^64));
+        x = MMIX.environment.loadMem((int)y, (int)z, 'T');
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDT: R[" + index + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -290,7 +291,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -308,12 +309,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             z = 0;
         }
 
-        x = MMIX.environment.loadMem((y + z) % (2^64));
+        x = MMIX.environment.loadMem((int)y, (int)z, 'O');
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDO: R[" + index + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -328,7 +329,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -346,12 +347,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             z = 0;
         }
 
-        x = MMIX.environment.loadMem((y + z) % (2^64));
+        x = MMIX.environment.loadMem((int)y, (int)z, 'T');
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDHT: R[" + index + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -366,7 +367,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -389,7 +390,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- " + x);
+            System.out.println("LDA: R[" + index + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -404,7 +405,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -413,8 +414,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         } else {
             x = 0;
         }
-
-        x = Math.abs(x);
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -432,12 +431,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             z = 0;
         }
 
-        int index = (y+z) % (2^64);
+        long index = (y+z) % 2064;
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(index, x);
-            System.out.println("STB: M[" + (index) + "] <- " + x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'B');
+            System.out.println("STB: M[" + (index) + "] <- R[" + ((Token) arg1).literal + "] " + MMIX.environment.loadMem((int)y, (int)z, 'B'));
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -452,7 +450,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -479,9 +477,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(y+z, x);
-            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+            x = MMIX.environment.loadReg((int)x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'W');
+            System.out.println("STW: M[" + (y+z) + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -496,7 +494,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -523,9 +521,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(y+z, x);
-            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+            x = MMIX.environment.loadReg((int)x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'T');
+            System.out.println("STT: M[" + (y+z) + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -540,7 +538,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -567,9 +565,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(y+z, x);
-            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+            x = MMIX.environment.loadReg((int)x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'O');
+            System.out.println("STO: M[" + (y+z) + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -584,7 +582,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -611,9 +609,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(y+z, x);
-            System.out.println("STB: M[" + (y+z) + "] <- " + x);
+            x = MMIX.environment.loadReg((int)x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'T');
+            System.out.println("STHT: M[" + (y+z) + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -628,7 +626,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg1 instanceof Integer) {
             x = (int) arg1;
@@ -655,8 +653,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg(x);
-            MMIX.environment.storeMem(y+z, x);
+            x = MMIX.environment.loadReg((int)x);
+            MMIX.environment.storeMem((int)y, (int)z, x, 'O');
             System.out.println("STB: M[" + (y+z) + "] <- " + x);
         } else {
             MMIX.error(stmt.line, "Not a register");
@@ -671,7 +669,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
 
-        int x,y;
+        long x,y;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -700,7 +698,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -737,7 +735,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -774,7 +772,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -811,7 +809,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -848,7 +846,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -885,7 +883,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -922,7 +920,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -959,7 +957,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -996,7 +994,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if (arg2 instanceof Token) {
             y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
@@ -1357,7 +1355,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1401,7 +1399,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1448,7 +1446,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1490,7 +1488,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1532,7 +1530,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1574,7 +1572,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1616,7 +1614,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1658,7 +1656,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1700,7 +1698,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1742,7 +1740,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1784,7 +1782,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1826,7 +1824,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1868,7 +1866,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1910,7 +1908,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1952,7 +1950,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -1994,7 +1992,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -2036,7 +2034,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -2078,7 +2076,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        int x,y,z;
+        long x,y,z;
 
         if(arg2 instanceof Integer) {
             y = (int) arg2;
@@ -2120,7 +2118,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2135,7 +2133,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x < 0) {
             System.out.println("BN: Branch taken - pc <- " + line);
@@ -2156,7 +2154,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2171,7 +2169,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x == 0) {
             System.out.println("BZ: Branch taken - pc <- " + line);
@@ -2192,7 +2190,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2207,7 +2205,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x > 0) {
             System.out.println("BP: Branch taken - pc <- " + line);
@@ -2228,7 +2226,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2243,7 +2241,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x % 2 == 0) {
             System.out.println("BOD: Branch taken - pc <- " + line);
@@ -2264,7 +2262,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2279,7 +2277,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x != 0) {
             System.out.println("BNN: Branch taken - pc <- " + line);
@@ -2300,7 +2298,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2315,7 +2313,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x != 0) {
             System.out.println("BP: Branch taken - pc <- " + line);
@@ -2336,7 +2334,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2351,7 +2349,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x <= 0) {
             System.out.println("BNP: Branch taken - pc <- " + line);
@@ -2372,7 +2370,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
 
         int line = 0;
-        int x = 0;
+        long x = 0;
 
         if(arg1 instanceof Token) {
             x = (int)((Token)arg1).literal;
@@ -2387,7 +2385,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             line = (int)((Token)arg2).literal;
         }
 
-        x = MMIX.environment.loadReg(x);
+        x = MMIX.environment.loadReg((int)x);
 
         if(x % 2 == 0) {
             System.out.println("BEV: Branch taken - pc <- " + line);

@@ -35,7 +35,7 @@ public class MMIX {
         /*
         for(Token token : tokens) {
             if(token.type != TokenType.EOL) {
-                System.out.println(token.lexeme + " ");
+                System.out.println(token.lexeme + " " + token.type);
             } else {
                 System.out.println(token.type.toString());
             }
