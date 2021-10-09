@@ -101,10 +101,11 @@ class Parser {
         opArgs.put(ADDU8, 3);
         opArgs.put(ADDU16, 3);
 
+        opArgs.put(SET, 2);
         opArgs.put(SETH, 2);
-        opArgs.put(SETMH, 3);
-        opArgs.put(SETML, 3);
-        opArgs.put(SETL, 3);
+        opArgs.put(SETMH, 2);
+        opArgs.put(SETML, 2);
+        opArgs.put(SETL, 2);
 
         opArgs.put(INCH, 3);
         opArgs.put(INCMH, 3);
@@ -316,6 +317,12 @@ class Parser {
                 return new Stmt.STCO(label, args, opcode.line);
             case LDA:
                 return new Stmt.LDA(label, args, opcode.line);
+            case SET:
+                return new Stmt.SETL(label, args, opcode.line);
+            case SADD:
+                return new Stmt.SADD(label, args, opcode.line);
+            case CMP:
+                return new Stmt.CMP(label, args, opcode.line);
             case BN:
                 return new Stmt.BN(label, args, opcode.line);
             case JMP:

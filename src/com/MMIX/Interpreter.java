@@ -1,5 +1,6 @@
 package com.MMIX;
 
+import java.util.BitSet;
 import java.util.List;
 import static com.MMIX.TokenType.*;
 
@@ -195,12 +196,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         x = MMIX.environment.loadMem((int)y, (int)z, 'B');
-        System.out.println(x);
 
         if(arg1 instanceof Token) {
             int index = (int)(((Token)arg1).literal);
             MMIX.environment.storeReg(index, x);
-            System.out.println("LDB: R[" + index + "] <- M[" + (y+z) + "]" + MMIX.environment.loadReg(index));
+            System.out.println("LDB: R[" + index + "] <- M[" + (y+z) + "] ~ " + MMIX.environment.loadReg(index));
         } else {
             MMIX.error(stmt.line, "Not a register");
         }
@@ -407,14 +407,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         long x,y,z;
 
-        if(arg1 instanceof Integer) {
-            x = (int) arg1;
-        } else if (arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
-        } else {
-            x = 0;
-        }
-
         if(arg2 instanceof Integer) {
             y = (int) arg2;
         } else if (arg2 instanceof Token) {
@@ -434,6 +426,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         long index = (y+z) % 2064;
 
         if(arg1 instanceof Token) {
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
             MMIX.environment.storeMem((int)y, (int)z, x, 'B');
             System.out.println("STB: M[" + (index) + "] <- R[" + ((Token) arg1).literal + "] " + MMIX.environment.loadMem((int)y, (int)z, 'B'));
         } else {
@@ -452,14 +445,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         long x,y,z;
 
-        if(arg1 instanceof Integer) {
-            x = (int) arg1;
-        } else if (arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
-        } else {
-            x = 0;
-        }
-
         if(arg2 instanceof Integer) {
             y = (int) arg2;
         } else if (arg2 instanceof Token) {
@@ -477,7 +462,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)x);
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
             MMIX.environment.storeMem((int)y, (int)z, x, 'W');
             System.out.println("STW: M[" + (y+z) + "] <- " + x);
         } else {
@@ -496,14 +481,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         long x,y,z;
 
-        if(arg1 instanceof Integer) {
-            x = (int) arg1;
-        } else if (arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
-        } else {
-            x = 0;
-        }
-
         if(arg2 instanceof Integer) {
             y = (int) arg2;
         } else if (arg2 instanceof Token) {
@@ -521,7 +498,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)x);
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
             MMIX.environment.storeMem((int)y, (int)z, x, 'T');
             System.out.println("STT: M[" + (y+z) + "] <- " + x);
         } else {
@@ -540,14 +517,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         long x,y,z;
 
-        if(arg1 instanceof Integer) {
-            x = (int) arg1;
-        } else if (arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
-        } else {
-            x = 0;
-        }
-
         if(arg2 instanceof Integer) {
             y = (int) arg2;
         } else if (arg2 instanceof Token) {
@@ -565,7 +534,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         if(arg1 instanceof Token) {
-            x = MMIX.environment.loadReg((int)x);
+            x = MMIX.environment.loadReg((int)(((Token)arg1).literal));
             MMIX.environment.storeMem((int)y, (int)z, x, 'O');
             System.out.println("STO: M[" + (y+z) + "] <- " + x);
         } else {
@@ -1072,12 +1041,45 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
-    // Come back
+    // Done
     @Override
     public Void visitSADD(Stmt.SADD stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
+
+        long x,y,z;
+
+        if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            MMIX.error(stmt.line, "y not a register");
+            return null;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = MMIX.environment.loadReg((int)(((Token)arg3).literal));
+        } else {
+            z = 0;
+        }
+
+        x = (y & ~z);
+
+        System.out.println(~z);
+
+        BitSet bit = BitSet.valueOf(new long[]{x});
+
+        x = bit.cardinality();
+
+        if(arg1 instanceof Token) {
+            int index = (int)(((Token)arg1).literal);
+            MMIX.environment.storeReg(index, x);
+            System.out.println("SADD: R[" + index + "] <- " + x);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         System.out.println("SADD done");
 
@@ -1149,9 +1151,25 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitSETL(Stmt.SETL stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("SETL done");
+        long x,y;
+
+        if(arg2 instanceof Integer) {
+            y = (int) arg2;
+        } else if (arg2 instanceof Token) {
+            y = MMIX.environment.loadReg((int)(((Token)arg2).literal));
+        } else {
+            y = 0;
+        }
+
+        x = (int)(((Token)arg1).literal);
+
+        if(arg1 instanceof Token) {
+            MMIX.environment.storeReg((int)x, y);
+            System.out.println("SETL: R[" + x + "] <- " + y);
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+        }
 
         return null;
     }
