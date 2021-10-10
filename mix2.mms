@@ -1,12 +1,10 @@
 x	    IS  	3
-y       IS      2
-five    IS      5
 
-Main    ADD     $1, $1, 2
-        ADD     $2, $1, -50
-    	ADD 	$255, $1, $2
-    	BN      $255, WHAT
-	    LDA	    $2, 3, 1
+Main    SET     $2, -50
+        ADD     $2, $2, 10
+        STO     $2, 10, 5
+        LDO     $2, 10, 5
+    	BN      $2, WHAT
 H1	    SUB     $3, $30, x
         JMP     WHAT
 WHAT	SUB 	$2, $3, 1

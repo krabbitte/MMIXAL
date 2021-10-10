@@ -2159,7 +2159,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 this.pc = line - 2;
             }
         } else {
-            System.out.println("BN: Branch not taken - pc <- " + line);
+            System.out.println("BN: Branch not taken");
         }
 
         return null;
