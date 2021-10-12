@@ -1,6 +1,7 @@
 package com.MMIX;
 
 import java.math.BigInteger;
+import java.util.Stack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +13,17 @@ public class Environment {
     final Map<String, Integer> labels = new HashMap<>();
     final List<Token> locals = new ArrayList<>();
 
+    private int startPC;
+    private int pcOffset;
+
     private byte[] memory = new byte[1024];
     private byte[][] registers = new byte[256][8];
     private byte[][] special = new byte[32][];
+
+    private Stack<byte[]> rStack = new Stack<>();
+
+    int l = 0;
+    int g = 255;
 
     Object get(Token name) {
         if(values.containsKey(name.lexeme)) {
@@ -33,6 +42,30 @@ public class Environment {
     }
 
     void define(String name, Object value) { values.put(name,value); }
+
+    public int decG() {
+        return g--;
+    }
+
+    public void setL(int index) {
+        l = index + 1;
+    }
+
+    public void incPcOffset() {
+        pcOffset++;
+    }
+
+    public int getPcOffset() {
+        return this.pcOffset;
+    }
+
+    public void setStartPC(int startPC) {
+        this.startPC = startPC;
+    }
+
+    public int getStartPC() {
+        return this.startPC;
+    }
 
     public void storeMem(int baseA, int offset, long value, char type) {
         int pos, bytes;
@@ -107,6 +140,11 @@ public class Environment {
     }
 
     public void storeReg(int index, long value) {
+
+        if(index > l && index < g) {
+            setL(index);
+        }
+
         byte[] num = new byte[] {
                 (byte) ((value >> 56) & 0xFFL),
                 (byte) ((value >> 48) & 0xFFL),
@@ -136,5 +174,18 @@ public class Environment {
                 ((num[7] & 0xFFL));
 
         return x;
+    }
+
+    public void pushReg(int n) {
+        for(int i = 0; i < n; i++) {
+            rStack.push(registers[i]);
+            clearReg(i);
+        }
+    }
+
+    void clearReg(int n) {
+        for(int i = 0; i < 8; i++) {
+            registers[n][i] = 0;
+        }
     }
 }

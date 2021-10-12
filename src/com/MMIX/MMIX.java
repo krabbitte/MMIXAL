@@ -35,7 +35,7 @@ public class MMIX {
         /*
         for(Token token : tokens) {
             if(token.type != TokenType.EOL) {
-                System.out.println(token.lexeme + " " + token.type);
+                System.out.println(token.lexeme + " " + token.type + "\t" + token.line);
             } else {
                 System.out.println(token.type.toString());
             }
@@ -48,8 +48,7 @@ public class MMIX {
         System.out.println("\n");
         for(Stmt statement : statements) {
             statement.toPrint();
-        }
-         */
+        }*/
 
         Interpreter interpreter = new Interpreter();
         interpreter.interpret(statements);

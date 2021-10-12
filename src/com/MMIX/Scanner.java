@@ -268,6 +268,7 @@ public class Scanner {
             case '/':
                 if(match('/')) {
                     while(peek() != '\n' && !isAtEnd()) advance();
+                    while(peek() == '\n') advance();
                 } else {
                     addToken(SLASH);
                 }
@@ -283,9 +284,7 @@ public class Scanner {
             case '\n':
                 addToken(EOL);
                 line++;
-                while(peek() == '\n') {
-                    advance();
-                }
+                while(peek() == '\n' || peek() == '\t' || peek() == ' ') advance();
                 break;
 
             case '"': string(); break;

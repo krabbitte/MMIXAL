@@ -10,6 +10,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private boolean halt = false;
 
     void interpret(List<Stmt> statements) {
+        pc = MMIX.environment.getStartPC();
         try {
             while(!halt) {
                 execute(statements.get(pc));
@@ -1154,6 +1155,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         long x,y;
 
+
         if(arg2 instanceof Integer) {
             y = (int) arg2;
         } else if (arg2 instanceof Token) {
@@ -2156,7 +2158,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x < 0) {
             System.out.println("BN: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BN: Branch not taken");
@@ -2192,7 +2194,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x == 0) {
             System.out.println("BZ: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BZ: Branch not taken - pc <- " + line);
@@ -2228,7 +2230,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x > 0) {
             System.out.println("BP: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BP: Branch not taken - pc <- " + line);
@@ -2264,7 +2266,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x % 2 == 0) {
             System.out.println("BOD: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BOD: Branch not taken - pc <- " + line);
@@ -2300,7 +2302,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x != 0) {
             System.out.println("BNN: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BNN: Branch not taken - pc <- " + line);
@@ -2336,7 +2338,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x != 0) {
             System.out.println("BP: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BP: Branch not taken - pc <- " + line);
@@ -2372,7 +2374,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x <= 0) {
             System.out.println("BNP: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BNP: Branch not taken - pc <- " + line);
@@ -2408,7 +2410,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x % 2 == 0) {
             System.out.println("BEV: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - 2;
+                this.pc = line - MMIX.environment.getPcOffset();
             }
         } else {
             System.out.println("BEV: Branch not taken - pc <- " + line);
@@ -2784,7 +2786,40 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         Object arg2 = evaluate(stmt.args.get(1));
         Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("PUSHGO done");
+        int line = 0;
+        long x, y, z;
+        x = y = z = 0;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            y = (int)((Token)arg2).literal;
+        }
+
+        if(arg3 instanceof Integer) {
+            z = (int)arg3;
+        } else if(arg3 instanceof Token) {
+            z = (int)((Token)arg3).literal;
+        }
+
+        x = MMIX.environment.loadReg((int)x);
+        line = (int)y + (int)z;
+
+        if(x < 0) {
+            System.out.println("PUSHGO: ");
+            if(line != 0) {
+                this.pc = line - 2;
+            }
+        } else {
+            System.out.println("BN: Branch not taken");
+        }
 
         return null;
     }
@@ -2972,7 +3007,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         System.out.println("JMP: pc <- " + line);
 
         if(line != 0) {
-            this.pc = line - 2;
+            this.pc = line - MMIX.environment.getPcOffset() - 2;
         }
 
         return null;

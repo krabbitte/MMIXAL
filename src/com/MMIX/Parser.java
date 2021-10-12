@@ -1,9 +1,6 @@
 package com.MMIX;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.MMIX.TokenType.*;
 
@@ -216,8 +213,13 @@ class Parser {
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         labelsInit();
+
         while(!isAtEnd()) {
-            statements.add(pseud());
+            Stmt temp = pseud();
+
+            if(temp != null) {
+                statements.add(temp);
+            }
         }
 
         return statements;
@@ -227,11 +229,22 @@ class Parser {
 
         if(match(PREFIX)) {
             prefix();
-        } else if(tokens.get(current).type == IDENTIFIER && tokens.get(current + 1).type == IS) {
-            return is();
+            return null;
         }
 
-        return instruction();
+        if(tokens.get(current).type == IDENTIFIER && tokens.get(current + 1).type == IS) {
+            is();
+            return null;
+        }
+
+        if(tokens.get(current).type == IDENTIFIER && tokens.get(current + 1).type == GREG) {
+            greg();
+            return null;
+        }
+
+        Stmt value = instruction();
+
+        return value;
     }
 
     private void prefix() {
@@ -246,24 +259,59 @@ class Parser {
         System.out.println("Prefix after = " + this.prefix);
     }
 
-    private Stmt is() {
+    private Void is() {
         Token key = consume("Where's the identifier", IDENTIFIER);
 
         Token opcode = consume("wheres the is?", IS);
 
-        Expr value = expression();
+        if(tokens.get(current).type == REG) {
+            MMIX.environment.values.put(key.lexeme, advance());
+        } else {
+            Expr value = expression();
+        }
 
         consume("wheres the newline/", EOL);
 
-        return new Stmt.IS(key, value, opcode.line);
+        MMIX.environment.incPcOffset();
+
+        return null;
+    }
+
+    private Void greg() {
+        Token key = consume("Where's the identifier", IDENTIFIER);
+
+        Token opcode = consume("wheres the GREG?", GREG);
+
+        int regNum = MMIX.environment.decG();
+        Token reg = new Token(REG, "$" + regNum, regNum, key.line);
+
+
+        for(int i = 0; i < tokens.size(); i++) {
+            if(tokens.get(i).lexeme.equals(key.lexeme)) {
+                tokens.remove(i);
+                tokens.add(i, reg);
+            }
+        }
+
+
+        consume("wheres the newline/", EOL);
+
+        MMIX.environment.incPcOffset();
+
+        return null;
     }
 
     private Stmt instruction() {
         Expr label;
         List<Expr> args = new ArrayList<>();
 
-        if(tokens.get(current).type == IDENTIFIER) {
+        if(tokens.get(current).lexeme.toLowerCase().equals("string")) {
+            string();
+            advance();
+            return null;
+        } else if(tokens.get(current).type == IDENTIFIER) {
             label = label();
+            if(tokens.get(current).lexeme.toLowerCase().equals("main")) MMIX.environment.setStartPC(tokens.get(current).line - MMIX.environment.getPcOffset() - 1);
             advance();
         } else if(tokens.get(current).type.ordinal() >= 19 && tokens.get(current).type.ordinal() <= 48){
             label = label();
@@ -274,6 +322,7 @@ class Parser {
 
         Token opcode = consumeOP("Unidentified opcode.");
         int numArgs = opArgs.get(opcode.type);
+
 
         for(int i = 0; i < numArgs; i++) {
             args.add(expression());
@@ -344,6 +393,10 @@ class Parser {
         }
 
         return new Expr.Label(label);
+    }
+
+    private Void string() {
+        return null;
     }
 
     private Expr expression() {
