@@ -160,10 +160,10 @@ class Parser {
         opArgs.put(CSOD, 3);
         opArgs.put(CSEV, 3);
 
-        opArgs.put(PUSHJ, 3);
-        opArgs.put(PUSHGO, 3);
+        opArgs.put(PUSHJ, 2);
+        opArgs.put(PUSHGO, 2);
 
-        opArgs.put(POP, 3);
+        opArgs.put(POP, 2);
 
         opArgs.put(SAVE, 2);
         opArgs.put(UNSAVE, 1);
@@ -285,14 +285,12 @@ class Parser {
         int regNum = MMIX.environment.decG();
         Token reg = new Token(REG, "$" + regNum, regNum, key.line);
 
-
         for(int i = 0; i < tokens.size(); i++) {
             if(tokens.get(i).lexeme.equals(key.lexeme)) {
                 tokens.remove(i);
                 tokens.add(i, reg);
             }
         }
-
 
         consume("wheres the newline/", EOL);
 
@@ -322,7 +320,6 @@ class Parser {
 
         Token opcode = consumeOP("Unidentified opcode.");
         int numArgs = opArgs.get(opcode.type);
-
 
         for(int i = 0; i < numArgs; i++) {
             args.add(expression());
@@ -376,6 +373,10 @@ class Parser {
                 return new Stmt.BN(label, args, opcode.line);
             case JMP:
                 return new Stmt.JMP(label, args, opcode.line);
+            case PUSHJ:
+                return new Stmt.PUSHJ(label, args, opcode.line);
+            case POP:
+                return new Stmt.POP(label, args, opcode.line);
             case TRIP:
                 return new Stmt.TRIP(label, args, opcode.line);
         }
@@ -495,7 +496,7 @@ class Parser {
 
     private Token consumeOP(String message) {
 
-        if(tokens.get(current).type.ordinal() >= 60 && tokens.get(current).type.ordinal() <= 256) {
+        if(tokens.get(current).type.ordinal() >= 81 && tokens.get(current).type.ordinal() <= 277) {
             return advance();
         }
 

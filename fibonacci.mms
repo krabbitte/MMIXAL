@@ -1,4 +1,6 @@
 n       IS     21
+a       GREG
+b       GREG
 
 Main    SET    $10, n
         ADD    $1,  $1,  1

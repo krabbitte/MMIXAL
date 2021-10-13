@@ -116,6 +116,7 @@ abstract class Stmt {
         R visitFLOTU(FLOTU stmt);
         R visitPUSHJ(PUSHJ stmt);
         R visitPUSHGO(PUSHGO stmt);
+        R visitPOP(POP stmt);
         R visitLDUNC(LDUNC stmt);
         R visitSTUNC(STUNC stmt);
         R visitPRELD(PRELD stmt);
@@ -3345,6 +3346,36 @@ abstract class Stmt {
         void toPrint() {
             String output = "";
             output += "PUSHGO";
+
+            for(Expr arg : args) {
+                output += arg.getValue() + " ";
+            }
+
+            output += " line: " + line;
+
+            System.out.println(output);
+        }
+
+
+        final Expr label;
+        final List<Expr> args;
+        final int line;
+    }
+
+    static class POP extends Stmt {
+        POP(Expr label, List<Expr> args, int line) {
+            this.label = label;
+            this.args = args;
+            this.line = line;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitPOP(this);
+        }
+        void toPrint() {
+            String output = "";
+            output += "POP";
 
             for(Expr arg : args) {
                 output += arg.getValue() + " ";

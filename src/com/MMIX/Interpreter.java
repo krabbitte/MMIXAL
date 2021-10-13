@@ -2772,9 +2772,38 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitPUSHJ(Stmt.PUSHJ stmt) {
         Object arg1 = evaluate(stmt.args.get(0));
         Object arg2 = evaluate(stmt.args.get(1));
-        Object arg3 = evaluate(stmt.args.get(2));
 
-        System.out.println("PUSHJ done");
+        int line = 0;
+        int x, y;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Token) {
+            y = (int)((Token)arg2).literal;
+        } else if(arg2 instanceof Integer) {
+            y = (int)arg2;
+        } else {
+            MMIX.error(stmt.line, "Not a label");
+            return null;
+        }
+
+        MMIX.environment.storeSpecial(rJ.ordinal() - 50, (long)stmt.line + 1);
+
+        MMIX.environment.pushReg();
+
+        line = y;
+
+        System.out.println("PUSHJ: pc <- " + line);
+
+        if(line != 0) {
+            this.pc = line - MMIX.environment.getPcOffset() - 2;
+        }
+
 
         return null;
     }
@@ -2812,14 +2841,43 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         x = MMIX.environment.loadReg((int)x);
         line = (int)y + (int)z;
 
-        if(x < 0) {
-            System.out.println("PUSHGO: ");
-            if(line != 0) {
-                this.pc = line - 2;
-            }
-        } else {
-            System.out.println("BN: Branch not taken");
+
+        System.out.println("PUSHGO: ");
+
+        if(line != 0) {
+            this.pc = line - 2;
         }
+
+        return null;
+    }
+
+    @Override
+    public Void visitPOP(Stmt.POP stmt) {
+        Object arg1 = evaluate(stmt.args.get(0));
+        Object arg2 = evaluate(stmt.args.get(1));
+
+        long line = 0;
+        long x, y;
+
+        if(arg1 instanceof Token) {
+            x = (int)((Token)arg1).literal;
+        } else if (arg1 instanceof Integer) {
+          x = (int)arg1;
+        } else {
+            MMIX.error(stmt.line, "Not a register");
+            return null;
+        }
+
+        if(arg2 instanceof Integer) {
+            y = (int)arg2;
+        } else if(arg2 instanceof Token) {
+            y = (int)((Token)arg2).literal;
+        }
+
+        line = MMIX.environment.loadSpecial(TokenType.rJ.ordinal() - 50);
+        MMIX.environment.popReg();
+
+        this.pc = (int)line - MMIX.environment.getPcOffset() - 2;
 
         return null;
     }
@@ -3077,7 +3135,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 }
 
             }
-
+        } else if(expr.name.type.ordinal() >= rA.ordinal() && expr.name.type.ordinal() <= rZZ.ordinal()) {
+            value = MMIX.environment.loadSpecial(expr.name.type.ordinal() - 50);
         } else {
             MMIX.error(expr.name,"identifier does not correspond to value");
         }

@@ -23,6 +23,13 @@ enum TokenType {
 
     PREFIX,
 
+    // Special Registers
+    rA, rB, rC, rD, rE, rF, rG, rH,
+    rI, rJ, rK, rL, rM, rN, rO, rP,
+    rQ, rR, rS, rT, rU, rV, rW, rX,
+    rY, rZ, rBB, rTT, rWW, rXX, rYY,
+    rZZ,
+
     // Assembler instructions
     IS, LOC, BYTE, WYDE, TETRA, OCTA, GREG, LOCAL, BSPEC, ESPEC,
 

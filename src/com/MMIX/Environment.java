@@ -18,7 +18,7 @@ public class Environment {
 
     private byte[] memory = new byte[1024];
     private byte[][] registers = new byte[256][8];
-    private byte[][] special = new byte[32][];
+    private byte[][] special = new byte[32][8];
 
     private Stack<byte[]> rStack = new Stack<>();
 
@@ -176,10 +176,53 @@ public class Environment {
         return x;
     }
 
-    public void pushReg(int n) {
-        for(int i = 0; i < n; i++) {
-            rStack.push(registers[i]);
+    public void storeSpecial(int index, long value) {
+        byte[] num = new byte[] {
+                (byte) ((value >> 56) & 0xFFL),
+                (byte) ((value >> 48) & 0xFFL),
+                (byte) ((value >> 40) & 0xFFL),
+                (byte) ((value >> 32) & 0xFFL),
+                (byte) ((value >> 24) & 0xFFL),
+                (byte) ((value >> 16) & 0xFFL),
+                (byte) ((value >> 8) & 0xFFL),
+                (byte) ((value) & 0xFFL),
+        };
+
+        for (int i = 0; i < num.length; i++) {
+            MMIX.environment.special[(int)index][i] = num[i];
+        }
+    }
+
+    public long loadSpecial(int index) {
+        byte[] num = this.special[index];
+
+        long x =((num[0] & 0xFFL) << 56) |
+                ((num[1] & 0xFFL) << 48) |
+                ((num[2] & 0xFFL) << 40) |
+                ((num[3] & 0xFFL) << 32) |
+                ((num[4] & 0xFFL) << 24) |
+                ((num[5] & 0xFFL) << 16) |
+                ((num[6] & 0xFFL) <<  8) |
+                ((num[7] & 0xFFL));
+
+        return x;
+    }
+
+    public void pushReg() {
+        for(int i = 0; i < l; i++) {
+            byte[] num = new byte[8];
+            for(int j = 0; j < 8; j++)
+                num[j] = registers[i][j];
+
+            rStack.push(num);
             clearReg(i);
+        }
+    }
+
+    public void popReg() {
+        for(int i = rStack.size() - 1; !rStack.empty(); i--) {
+            byte[] num = rStack.pop();
+            registers[i] = num;
         }
     }
 

@@ -5,17 +5,21 @@ bob     GREG
 
 //String  BYTE    "Hello", #a, 0
 
-Hello   ADD     $2, bits, 10
-        SET     bits, $2
-        SET     jim, bits
-        JMP     F1
-        ADD     $5, bits,  2
-Main    ADD     $9, bits, 3
-        STO     $2, 10, 5
-        JMP     Hello
-        LDO     $2, 10, 5
-    	BN      $2, WHAT
-H1	    SUB     $3, $30, x
-WHAT	SUB 	$2, $3, 1
-    	STB     $1, 1, 0
-	    TRIP
+Main    SET     $0,     1
+        SET     $1,     2
+        SET     $2,     3
+        SET     $3,     4
+        SET     $4,     5
+        SET     $5,     6
+        SET     bits,  15
+        PUSHJ   $6,     WeeWoo
+        ADD     $0,     $4,     3
+        TRIP
+
+WeeWoo  SET     $0,     10
+        SET     $1,     20
+        SET     $2,     30
+        ADD     $2,     bits,   21
+        SET     $3,     40
+        SET     $4,     50
+        POP     0,      2
