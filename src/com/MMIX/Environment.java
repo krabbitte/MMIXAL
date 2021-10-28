@@ -22,7 +22,7 @@ public class Environment {
 
     private Stack<byte[]> rStack = new Stack<>();
 
-    int l = 0;
+    long l = 0;
     int g = 255;
 
     Object get(Token name) {
@@ -209,6 +209,7 @@ public class Environment {
     }
 
     public void pushReg() {
+
         for(int i = 0; i < l; i++) {
             byte[] num = new byte[8];
             for(int j = 0; j < 8; j++)
@@ -217,10 +218,36 @@ public class Environment {
             rStack.push(num);
             clearReg(i);
         }
+
+        byte[] lReg = new byte[] {
+                (byte) ((l >> 56) & 0xFFL),
+                (byte) ((l >> 48) & 0xFFL),
+                (byte) ((l >> 40) & 0xFFL),
+                (byte) ((l >> 32) & 0xFFL),
+                (byte) ((l >> 24) & 0xFFL),
+                (byte) ((l >> 16) & 0xFFL),
+                (byte) ((l >> 8) & 0xFFL),
+                (byte) ((l) & 0xFFL),
+        };
+
+        rStack.push(lReg);
     }
 
     public void popReg() {
-        for(int i = rStack.size() - 1; !rStack.empty(); i--) {
+
+        byte[] lReg = rStack.pop();
+
+        l =((lReg[0] & 0xFFL) << 56) |
+                ((lReg[1] & 0xFFL) << 48) |
+                ((lReg[2] & 0xFFL) << 40) |
+                ((lReg[3] & 0xFFL) << 32) |
+                ((lReg[4] & 0xFFL) << 24) |
+                ((lReg[5] & 0xFFL) << 16) |
+                ((lReg[6] & 0xFFL) <<  8) |
+                ((lReg[7] & 0xFFL));
+
+
+        for(int i = rStack.size() - 1; !rStack.isEmpty(); i--) {
             byte[] num = rStack.pop();
             registers[i] = num;
         }

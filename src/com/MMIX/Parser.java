@@ -267,7 +267,7 @@ class Parser {
         if(tokens.get(current).type == REG) {
             MMIX.environment.values.put(key.lexeme, advance());
         } else {
-            Expr value = expression();
+            MMIX.environment.values.put(key.lexeme, tokens.get(current++).literal);
         }
 
         consume("wheres the newline/", EOL);

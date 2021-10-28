@@ -2158,7 +2158,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(x < 0) {
             System.out.println("BN: Branch taken - pc <- " + line);
             if(line != 0) {
-                this.pc = line - MMIX.environment.getPcOffset();
+                this.pc = line - MMIX.environment.getPcOffset() - 2;
             }
         } else {
             System.out.println("BN: Branch not taken");
@@ -2803,7 +2803,6 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         if(line != 0) {
             this.pc = line - MMIX.environment.getPcOffset() - 2;
         }
-
 
         return null;
     }
